@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить статью</title>
+</head>
+<body>
+<h2>Добавить новую статью</h2>
+
+<form th:action="@{/articles}" method="post">
+    <label>Заголовок:</label>
+    <input type="text" name="title" required />
+    <br />
+
+    <label>Описание:</label>
+    <input type="text" name="description" />
+    <br />
+
+    <label>Содержимое:</label>
+    <textarea name="content" required></textarea>
+    <br />
+
+    <label>Автор:</label>
+    <select name="authorId">
+        <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
+    </select>
+    <br />
+
+    <label>Теги:</label>
+    <select name="tagIds" multiple>
+        <option th:each="tag : ${tags}" th:value="${tag.id}" th:text="${tag.name}"></option>
+    </select>
+    <br />
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<a href="/articles">Назад к списку статей</a>
+
+</body>
+</html>
