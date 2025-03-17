@@ -6,5 +6,5 @@ import java.util.UUID;
 
 public interface AuthorService {
     List<Author> getAllAuthors();
-    Author getAuthorById(UUID id);
+    Author getAuthorById(Long id);
 }

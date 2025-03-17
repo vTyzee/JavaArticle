@@ -20,7 +20,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author getAuthorById(UUID id) {
+    public Author getAuthorById(Long id) {
         return authorRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Автор не найден"));
     }

@@ -2,19 +2,16 @@ package com.example.Articles.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
-import java.util.UUID;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // автоинкремент
+    private Long id;
 
     @Column(nullable = false, unique = true, length = 30)
     private String username;
@@ -38,31 +35,33 @@ public class User {
     )
     private List<Article> favoriteArticles;
 
+    // Пустой конструктор
     public User() {}
 
-    public User(UUID id, String username, String email, String password, String bio, String image_url, LocalDateTime createdAt, List<Article> favoriteArticles) {
-        this.id = id;
+    // При необходимости - конструктор без ID (ID генерируется в БД)
+    public User(String username, String email, String password, String bio, String image_url, LocalDateTime createdAt) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.bio = bio;
         this.image_url = image_url;
         this.createdAt = createdAt;
-        this.favoriteArticles = favoriteArticles;
     }
 
-    public UUID getId() {
+    // Геттеры и сеттеры
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
+
+    // ... остальные геттеры и сеттеры ...
 
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String username) {
         this.username = username;
     }

@@ -12,8 +12,9 @@ public interface ArticleService {
     Article updateArticle(Long id, Article updatedArticle);
     void deleteArticle(Long id);
     List<Article> getArticlesByAuthor(UUID authorId);
-    List<Article> getArticlesByTag(Long tagId);
-    List<Article> searchArticles(String query);
 
     List<Article> getArticlesByAuthor(Long authorId);
+    List<Article> getArticlesByTag(Long tagId);
+
+    List<Article> searchArticles(String query);
 }

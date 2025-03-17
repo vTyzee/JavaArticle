@@ -7,6 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ArticlesApplication {
     public static void main(String[] args) {
         SpringApplication.run(ArticlesApplication.class, args);
-        System.out.println("УРАААААААААААААААААААААААААААААА!");
+        System.out.println("Work in progress");
     }
 }

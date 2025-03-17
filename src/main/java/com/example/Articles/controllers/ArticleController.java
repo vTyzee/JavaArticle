@@ -78,7 +78,7 @@ public class ArticleController {
     }
 
     @GetMapping("/by-author/{authorId}")
-    public String getArticlesByAuthor(@PathVariable UUID authorId, Model model) { // ✅ Исправлено
+    public String getArticlesByAuthor(@PathVariable Long authorId, Model model) {
         List<Article> articles = articleService.getArticlesByAuthor(authorId);
         model.addAttribute("articles", articles);
         return "articles/list";

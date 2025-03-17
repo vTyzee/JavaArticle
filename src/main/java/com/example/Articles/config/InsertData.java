@@ -29,9 +29,9 @@ public class InsertData implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        //seedUsers();
-        //seedTags();
-        //seedArticles();
+        seedUsers();
+        seedTags();
+        seedArticles();
     }
 
     private void seedUsers() {
@@ -60,7 +60,7 @@ public class InsertData implements CommandLineRunner {
         List<Tag> tags = tagRepository.findAll();
 
         if (users.isEmpty() || tags.isEmpty()) {
-            return;
+            return ;
         }
 
 
