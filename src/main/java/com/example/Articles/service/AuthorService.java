@@ -7,4 +7,10 @@ import java.util.UUID;
 public interface AuthorService {
     List<Author> getAllAuthors();
     Author getAuthorById(Long id);
+
+    // добавить
+    Author saveAuthor(Author author);
+    Author updateAuthor(Long id, Author updatedAuthor);
+    void deleteAuthor(Long id);
 }
+

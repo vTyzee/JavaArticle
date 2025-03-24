@@ -30,10 +30,13 @@ public class ArticleServiceImpl implements ArticleService {
     public Article createArticle(Article article) {
         return articleRepository.save(article);
     }
+
+    /**
+     * Простой поиск по названию ИЛИ содержимому
+     */
     @Override
     public List<Article> searchArticles(String query) {
-
-        return null; // Replace with actual implementation
+        return articleRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(query, query);
     }
 
     @Override
@@ -56,11 +59,11 @@ public class ArticleServiceImpl implements ArticleService {
         articleRepository.deleteById(id);
     }
 
+    // Если не нужен метод с UUID, можно убрать
     @Override
     public List<Article> getArticlesByAuthor(UUID authorId) {
         return List.of();
     }
-
 
     @Override
     public List<Article> getArticlesByTag(Long tagId) {

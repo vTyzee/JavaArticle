@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать автора</title>
+</head>
+<body>
+<h1>Редактировать автора</h1>
+<form th:action="@{/authors/update/{id}(id=${author.id})}"
+      method="post"
+      th:object="${author}">
+    <label for="name">Имя:</label>
+    <input type="text" id="name" th:field="*{name}" required/>
+    <br/>
+    <label for="bio">Bio:</label>
+    <textarea id="bio" th:field="*{bio}"></textarea>
+    <br/>
+    <button type="submit">Сохранить</button>
+</form>
+<a href="/authors">Назад</a>
+</body>
+</html>

@@ -1,10 +1,16 @@
 package com.example.Articles.entity;
 
+import com.example.Articles.roles.Role;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Сущность пользователя.
+ * Важно: пароль хранить только в зашифрованном (bcrypt) виде!
+ */
 @Entity
 @Table(name = "users")
 public class User {
@@ -23,10 +29,15 @@ public class User {
     private String bio;
     private String image_url;
 
+    @Enumerated(EnumType.STRING) // "USER" / "ADMIN"
+    @Column(nullable = false)
+    private Role role = Role.USER; // по умолчанию
+
     @CreationTimestamp
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
+    // Пример связи "многие ко многим" со статьями (favorite)
     @ManyToMany
     @JoinTable(
             name = "article_favorite",
@@ -35,33 +46,30 @@ public class User {
     )
     private List<Article> favoriteArticles;
 
-    // Пустой конструктор
-    public User() {}
+    public User() {
+    }
 
-    // При необходимости - конструктор без ID (ID генерируется в БД)
-    public User(String username, String email, String password, String bio, String image_url, LocalDateTime createdAt) {
+    public User(String username, String email, String password, String bio, String image_url, Role role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.bio = bio;
         this.image_url = image_url;
-        this.createdAt = createdAt;
+        this.role = role;
     }
 
-    // Геттеры и сеттеры
+    // ===== GETTERS / SETTERS =====
+
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    // ... остальные геттеры и сеттеры ...
+    public void setId(Long id) { this.id = id; }
 
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -74,6 +82,9 @@ public class User {
         this.email = email;
     }
 
+    /**
+     * При сохранении обязательно хешируйте пароль!
+     */
     public String getPassword() {
         return password;
     }
@@ -98,12 +109,16 @@ public class User {
         this.image_url = image_url;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public Role getRole() {
+        return role;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public List<Article> getFavoriteArticles() {

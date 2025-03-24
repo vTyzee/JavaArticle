@@ -30,10 +30,12 @@
             </div>
 
             <div class="mb-3">
-                <label for="author" class="form-label">Автор:</label>
-                <select name="authorId" id="author" class="form-select">
-                    <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
+                <select name="author.id" id="author">
+                    <option th:each="auth : ${authors}"
+                            th:value="${auth.id}"
+                            th:text="${auth.name}"></option>
                 </select>
+
             </div>
 
             <div class="mb-3">

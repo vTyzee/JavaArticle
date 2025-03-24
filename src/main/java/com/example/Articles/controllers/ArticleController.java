@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/articles")
@@ -20,12 +18,13 @@ public class ArticleController {
     private final TagService tagService;
 
     @Autowired
-    public ArticleController(ArticleService articleService, AuthorService authorService, TagService tagService) {
+    public ArticleController(ArticleService articleService,
+                             AuthorService authorService,
+                             TagService tagService) {
         this.articleService = articleService;
         this.authorService = authorService;
         this.tagService = tagService;
     }
-
 
     @GetMapping
     public String getAllArticles(Model model) {
@@ -55,7 +54,6 @@ public class ArticleController {
         articleService.createArticle(article);
         return "redirect:/articles";
     }
-
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
