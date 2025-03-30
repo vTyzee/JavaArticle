@@ -2,6 +2,7 @@ package com.example.articles.service;
 
 import com.example.articles.entities.Article;
 import com.example.articles.repositories.ArticleRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,9 +18,10 @@ public class ArticleServiceImpl implements ArticleService {
         this.articleRepository = articleRepository;
     }
 
+    // Получаем статьи, отсортированные по updatedAt (новые/отредактированные первыми)
     @Override
     public List<Article> getAllArticles() {
-        return articleRepository.findAll();
+        return articleRepository.findAll(Sort.by(Sort.Direction.DESC, "updatedAt"));
     }
 
     @Override
@@ -29,8 +31,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Article createArticle(Article article) {
-        article.setCreatedAt(LocalDateTime.now());
-        article.setUpdatedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        article.setCreatedAt(now);
+        article.setUpdatedAt(now);
         return articleRepository.save(article);
     }
 
@@ -42,11 +45,10 @@ public class ArticleServiceImpl implements ArticleService {
                     article.setDescription(updatedArticle.getDescription());
                     article.setSlug(updatedArticle.getSlug());
                     article.setBody(updatedArticle.getBody());
+                    // Обновляем updatedAt при редактировании
                     article.setUpdatedAt(LocalDateTime.now());
-                    // Обновляем ассоциации (автор и теги)
                     article.setAuthor(updatedArticle.getAuthor());
                     article.setTags(updatedArticle.getTags());
-                    // НЕ заменяем коллекции комментариев и избранного – оставляем их как есть
                     return articleRepository.save(article);
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Article not found with id " + id));
@@ -59,22 +61,21 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<Article> getArticlesByAuthor(Long authorId) {
-        return articleRepository.findByAuthor_Id(authorId);
+        return articleRepository.findByAuthorId(authorId);
     }
 
     @Override
     public List<Article> getArticlesByTag(Long tagId) {
-        return articleRepository.findByTags_Id(tagId);
+        return articleRepository.findByTagId(tagId);
     }
 
     @Override
     public List<Article> searchArticles(String query) {
-        // Реализуйте поиск по необходимости
-        return null;
+        return articleRepository.searchArticles(query);
     }
 
     @Override
-    public List<Article> findAll() {
-        return articleRepository.findAll();
+    public List<Article> getArticlesByCreatedMonth(int month) {
+        return articleRepository.findByCreatedMonth(month);
     }
 }

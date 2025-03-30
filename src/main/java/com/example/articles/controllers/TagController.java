@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @Controller
 @RequestMapping("/tags")
 public class TagController {
@@ -16,37 +18,29 @@ public class TagController {
         this.tagService = tagService;
     }
 
+    // GET /tags — показать список тегов (HTML)
     @GetMapping
     public String listTags(Model model) {
         model.addAttribute("tags", tagService.getAllTags());
-        return "tags/list";
+        return "tags/list"; // имя Thymeleaf-шаблона, например, src/main/resources/templates/tags/list.html
     }
 
+    // GET /tags/new — форма добавления тега
     @GetMapping("/new")
     public String showAddForm(Model model) {
         model.addAttribute("tag", new Tag());
-        return "tags/add";
+        return "tags/add"; // шаблон для формы добавления тега
     }
 
+    // POST /tags — добавить тег
     @PostMapping
     public String createTag(@ModelAttribute Tag tag) {
+        tag.setCreatedAt(LocalDateTime.now());
         tagService.createTag(tag);
         return "redirect:/tags";
     }
 
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
-        Tag tag = tagService.getTagById(id);
-        model.addAttribute("tag", tag);
-        return "tags/edit";
-    }
-
-    @PostMapping("/update/{id}")
-    public String updateTag(@PathVariable Long id, @ModelAttribute Tag tag) {
-        tagService.updateTag(id, tag);
-        return "redirect:/tags";
-    }
-
+    // GET /tags/delete/{id} — удалить тег
     @GetMapping("/delete/{id}")
     public String deleteTag(@PathVariable Long id) {
         tagService.deleteTag(id);

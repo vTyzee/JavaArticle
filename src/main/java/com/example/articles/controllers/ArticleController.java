@@ -1,15 +1,13 @@
 package com.example.articles.controllers;
 
 import com.example.articles.entities.Article;
-import com.example.articles.entities.ArticleComment;
 import com.example.articles.entities.Author;
 import com.example.articles.entities.Tag;
 import com.example.articles.entities.User;
-import com.example.articles.repositories.ArticleCommentRepository;
-import com.example.articles.repositories.UserRepository;
 import com.example.articles.service.ArticleService;
 import com.example.articles.service.AuthorService;
 import com.example.articles.service.TagService;
+import com.example.articles.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,49 +27,47 @@ public class ArticleController {
     private final AuthorService authorService;
     private final TagService tagService;
     private final UserRepository userRepository;
-    private final ArticleCommentRepository articleCommentRepository;
 
     @Autowired
     public ArticleController(ArticleService articleService,
                              AuthorService authorService,
                              TagService tagService,
-                             UserRepository userRepository,
-                             ArticleCommentRepository articleCommentRepository) {
+                             UserRepository userRepository) {
         this.articleService = articleService;
         this.authorService = authorService;
         this.tagService = tagService;
         this.userRepository = userRepository;
-        this.articleCommentRepository = articleCommentRepository;
     }
 
+    // GET /articles – показать список всех статей (с сортировкой по updatedAt DESC)
     @GetMapping
     public String listArticles(Model model) {
         List<Article> articles = articleService.getAllArticles();
         model.addAttribute("articles", articles);
+        // Передаем текущего пользователя (если авторизован)
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-            model.addAttribute("currentUser", null);
-        } else {
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             User currentUser = userRepository.findByUsername(auth.getName());
             model.addAttribute("currentUser", currentUser);
         }
         return "articles/list";
     }
 
+    // GET /articles/{id} – показать статью по ID
     @GetMapping("/{id}")
     public String articleDetails(@PathVariable Long id, Model model) {
         Article article = articleService.getArticleById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Article not found with id " + id));
         model.addAttribute("article", article);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = null;
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            currentUser = userRepository.findByUsername(auth.getName());
+            User currentUser = userRepository.findByUsername(auth.getName());
+            model.addAttribute("currentUser", currentUser);
         }
-        model.addAttribute("currentUser", currentUser);
         return "articles/details";
     }
 
+    // GET /articles/new – форма добавления статьи
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("article", new Article());
@@ -81,6 +76,7 @@ public class ArticleController {
         return "articles/add";
     }
 
+    // POST /articles – добавить новую статью
     @PostMapping
     public String createArticle(@ModelAttribute("article") Article article,
                                 @RequestParam("authorId") Long authorId,
@@ -101,6 +97,7 @@ public class ArticleController {
         return "redirect:/articles";
     }
 
+    // GET /articles/edit/{id} – форма редактирования статьи
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Article article = articleService.getArticleById(id)
@@ -108,6 +105,7 @@ public class ArticleController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         User currentUser = userRepository.findByUsername(username);
+        // Проверяем права (либо администратор, либо владелец)
         if (!currentUser.getRole().equals(User.Roles.ADMIN_ROLE) &&
                 (article.getOwner() == null || !article.getOwner().getId().equals(currentUser.getId()))) {
             return "redirect:/access-denied";
@@ -118,6 +116,7 @@ public class ArticleController {
         return "articles/edit";
     }
 
+    // POST /articles/update/{id} – обновить статью
     @PostMapping("/update/{id}")
     public String updateArticle(@PathVariable Long id,
                                 @ModelAttribute("article") Article updatedArticle,
@@ -140,12 +139,13 @@ public class ArticleController {
             tags.add(tag);
         }
         updatedArticle.setTags(tags);
+        // Сохраняем владельца из существующей статьи
         updatedArticle.setOwner(existingArticle.getOwner());
         articleService.updateArticle(id, updatedArticle);
         return "redirect:/articles";
     }
 
-
+    // GET /articles/delete/{id} – удалить статью
     @GetMapping("/delete/{id}")
     public String deleteArticle(@PathVariable Long id) {
         Article article = articleService.getArticleById(id)
@@ -161,22 +161,41 @@ public class ArticleController {
         return "redirect:/articles";
     }
 
-    @PostMapping("/{id}/comments")
-    public String addComment(@PathVariable Long id, @RequestParam("body") String body) {
-        Article article = articleService.getArticleById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Article not found with id " + id));
+    // GET /articles/by-month?month=... – поиск статей по месяцу публикации
+    @GetMapping("/by-month")
+    public String getArticlesByMonth(@RequestParam("month") int month, Model model) {
+        List<Article> articles = articleService.getArticlesByCreatedMonth(month);
+        model.addAttribute("articles", articles);
+        // Можно добавить текущего пользователя, если нужно
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-            return "redirect:/login";
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            User currentUser = userRepository.findByUsername(auth.getName());
+            model.addAttribute("currentUser", currentUser);
         }
-        User currentUser = userRepository.findByUsername(auth.getName());
-        ArticleComment comment = new ArticleComment();
-        comment.setBody(body);
-        comment.setArticle(article);
-        comment.setUser(currentUser);
-        comment.setCreatedAt(LocalDateTime.now().withSecond(0).withNano(0));
-        comment.setUpdatedAt(LocalDateTime.now().withSecond(0).withNano(0));
-        articleCommentRepository.save(comment);
-        return "redirect:/articles/" + id;
+        return "articles/list";
+    }
+
+    // GET /articles/by-author/{authorId} – показать статьи по автору
+    @GetMapping("/by-author/{authorId}")
+    public String getArticlesByAuthor(@PathVariable Long authorId, Model model) {
+        List<Article> articles = articleService.getArticlesByAuthor(authorId);
+        model.addAttribute("articles", articles);
+        return "articles/list";
+    }
+
+    // GET /articles/by-tag/{tagId} – показать статьи по тегу
+    @GetMapping("/by-tag/{tagId}")
+    public String getArticlesByTag(@PathVariable Long tagId, Model model) {
+        List<Article> articles = articleService.getArticlesByTag(tagId);
+        model.addAttribute("articles", articles);
+        return "articles/list";
+    }
+
+    // GET /articles/search?q=... – поиск статей по заголовку или содержимому
+    @GetMapping("/search")
+    public String searchArticles(@RequestParam("q") String query, Model model) {
+        List<Article> articles = articleService.searchArticles(query);
+        model.addAttribute("articles", articles);
+        return "articles/list";
     }
 }

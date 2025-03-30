@@ -1,27 +1,28 @@
 package com.example.articles.repositories;
 
 import com.example.articles.entities.Article;
-import com.example.articles.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
-    // Поиск статьи по полному названию
-    List<Article> findByTitle(String title);
+    // Найти статьи по ID автора
+    @Query("SELECT a FROM Article a WHERE a.author.id = :authorId")
+    List<Article> findByAuthorId(@Param("authorId") Long authorId);
 
-    // Поиск статей, в названии которых содержится указанный отрывок (без учета регистра)
-    List<Article> findByTitleContainingIgnoreCase(String titlePart);
+    // Найти статьи, содержащие указанный тег (по ID тега)
+    @Query("SELECT a FROM Article a JOIN a.tags t WHERE t.id = :tagId")
+    List<Article> findByTagId(@Param("tagId") Long tagId);
 
-    // Поиск статей по тегу (по имени тега)
-    List<Article> findByTags_Name(String tagName);
+    // Поиск статей по части заголовка или содержимого (без учета регистра)
+    @Query("SELECT a FROM Article a WHERE lower(a.title) LIKE lower(concat('%', :q, '%')) OR lower(a.body) LIKE lower(concat('%', :q, '%'))")
+    List<Article> searchArticles(@Param("q") String query);
 
-    // Поиск статей по автору (при передаче объекта User)
-    List<Article> findByAuthor(User author);
+    // Найти статьи, опубликованные в определенном месяце (например, 1 — январь)
+    @Query("SELECT a FROM Article a WHERE MONTH(a.createdAt) = :month")
+    List<Article> findByCreatedMonth(@Param("month") int month);
 
-    // Поиск статей по автору по id
-    List<Article> findByAuthor_Id(Long authorId);
-
-    // Поиск статей по тегу по id
-    List<Article> findByTags_Id(Long tagId);
 }
