@@ -51,7 +51,8 @@ CREATE USER 'emilxima'@'localhost' IDENTIFIED BY 'emilxima';
 GRANT ALL PRIVILEGES ON articles_db.* TO 'emilxima'@'localhost';
 FLUSH PRIVILEGES;
 Скачайте код с GitHub
-Код проекта доступен по ссылке: [ArticlesApplication на GitHub.](https://github.com/vTyzee/JavaArticle)
+Код проекта доступен по ссылке:
+[ArticlesApplication на GitHub.](https://github.com/vTyzee/JavaArticle)
 
 Запустите проект
 Разархивируйте скачанный архив и откройте проект в удобной для вас среде разработки (например, IntelliJ IDEA). Запустите класс ArticlesApplication. 
