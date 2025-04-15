@@ -51,7 +51,7 @@ CREATE USER 'emilxima'@'localhost' IDENTIFIED BY 'emilxima';
 GRANT ALL PRIVILEGES ON articles_db.* TO 'emilxima'@'localhost';
 FLUSH PRIVILEGES;
 Скачайте код с GitHub
-Код проекта доступен по ссылке: ArticlesApplication на GitHub.
+Код проекта доступен по ссылке: [ArticlesApplication на GitHub.](https://github.com/vTyzee/JavaArticle)
 
 Запустите проект
 Разархивируйте скачанный архив и откройте проект в удобной для вас среде разработки (например, IntelliJ IDEA). Запустите класс ArticlesApplication. 
@@ -61,7 +61,7 @@ FLUSH PRIVILEGES;
 
 Статьи:
 – Возможность создавать, редактировать, удалять и искать статьи.
-– Поиск можно выполнять с помощью текстового запроса или с помощью календаря (выбор месяца в формате yyyy‑MM).
+– Поиск можно выполнять с помощью текстового запроса или с помощью календаря (выбор месяца в формате dd-yyyy‑MM).
 
 Пользователи:
 – Гости могут просматривать статьи.
